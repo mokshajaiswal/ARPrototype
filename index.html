@@ -362,20 +362,20 @@
             let modelPath = 'model1.glb';
 
             if (traceData) {
-            if (traceData.traceType === 'private') {
-                modelPath = 'models/heart.glb'; // Private traces
-            } else if (traceData.traceType === 'public') {
-                if (traceData.isFriend) {
-                    modelPath = 'models/stargreen.glb'; // Public traces from a friend
-                } else {
-                    modelPath = 'models/staryellow.glb'; // Public traces from a non-friend
+                if (traceData.traceType === 'private') {
+                    modelPath = 'models/heart.glb'; // Private traces
+                } else if (traceData.traceType === 'public') {
+                    if (traceData.isFriend) {
+                        modelPath = 'models/stargreen.glb'; // Public traces from a friend
+                    } else {
+                        modelPath = 'models/staryellow.glb'; // Public traces from a non-friend
+                    }
                 }
+            } else {
+                console.warn('Trace data not received from parent app. Using default model.');
             }
-        } else {
-            console.warn('Trace data not received from parent app. Using default model.');
-        }
 
-        console.log(`Loading model: ${modelPath}`); // For debugging
+            console.log(`Loading model: ${modelPath}`); // For debugging
 
             loader.load(
                 modelPath,
@@ -402,8 +402,14 @@
                 undefined,
                 function (error) {
                     console.error('An error happened while loading the model:', error);
-                    alert('Failed to load the custom 3D model. A fallback pin will be used instead.');
                     
+                    // REMOVED: The blocking alert that caused the loop.
+                    // alert('Failed to load the custom 3D model. A fallback pin will be used instead.');
+                    
+                    // ADDED: Use the non-blocking tooltip to show the error.
+                    tooltip.textContent = 'Model failed to load. Using a fallback.';
+                    tooltip.style.display = 'block';
+
                     // --- START: Implemented Fallback Logic ---
                     const fallbackGeometry = new THREE.ConeGeometry(0.05, 0.2, 16); // radius, height, segments
                     const fallbackMaterial = new THREE.MeshStandardMaterial({ color: 0xE53935 }); // A red color
