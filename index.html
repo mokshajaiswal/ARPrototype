@@ -401,10 +401,32 @@
                 },
                 undefined,
                 function (error) {
-                    console.error('An error happened while loading the model:', error);
-                    alert('Failed to load the custom 3D model. A fallback pin will be used instead.');
-                    // Fallback cone creation logic...
-                }
+    console.error('An error happened while loading the model:', error);
+    alert('Failed to load the custom 3D model. A fallback pin will be used instead.');
+
+    // --- START: Implemented Fallback Logic ---
+    const fallbackGeometry = new THREE.ConeGeometry(0.05, 0.2, 16); // radius, height, segments
+    const fallbackMaterial = new THREE.MeshStandardMaterial({ color: 0xE53935 }); // A red color
+    const fallbackModel = new THREE.Mesh(fallbackGeometry, fallbackMaterial);
+
+    // This part is similar to the successful load logic
+    collectibleModel = fallbackModel; // The cone can now be tapped
+    pin = new THREE.Group();
+    pin.add(fallbackModel);
+
+    // Create a simple shadow for the fallback
+    const box = new THREE.Box3().setFromObject(fallbackModel);
+    const size = box.getSize(new THREE.Vector3());
+    const shadow = createShadow(size);
+    shadow.position.y = -size.y / 2;
+    pin.add(shadow);
+    
+    // Set a consistent scale and add to the scene
+    pin.scale.set(0.2, 0.2, 0.2); 
+    pin.visible = false;
+    if(scene) scene.add(pin);
+    // --- END: Implemented Fallback Logic ---
+}
             );
         }
 
