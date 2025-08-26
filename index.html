@@ -258,7 +258,7 @@
         function createChatBubble(text, modelSize) {
             const canvas = document.createElement('canvas');
             canvas.width = 200; // Reduced width for less padding
-            canvas.height = 80; // Reduced height for less padding
+            canvas.height = 60; // Reduced height for less padding
             const ctx = canvas.getContext('2d');
 
             // Draw rounded rectangle bubble with less padding
@@ -280,7 +280,7 @@
             const bubble = new THREE.Mesh(geometry, material);
 
             // Position higher above the model
-            bubble.position.y = modelSize.y / 2 + 20; // Increased offset for higher placement
+            bubble.position.y = modelSize.y / 2 + 40; // Increased offset for higher placement
 
             return bubble;
         }
