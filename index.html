@@ -120,7 +120,7 @@
         #tooltip {
             position: fixed; /* Ensures positioning is relative to the browser window */
             top: 30px;
-            left: 50%; /* Moves the element's left edge to the center */
+            left:20px; /* Moves the element's left edge to the center */
             transform: translateX(-50%); /* Shifts the element left by half its own width */
             width: calc(100% - 40px); /* Prevents the tooltip from touching screen edges */
             max-width: 450px; /* Sets a max-width for better readability on large screens */
@@ -197,7 +197,7 @@
             ROTATION_SPEED: 0.01,
             HORIZONTAL_THRESHOLD: 0.95, // Cosine similarity threshold for horizontal planes
             SURFACE_DETECTION_TIMEOUT: 8000, // 8 seconds
-            DEFAULT_PLACEMENT_DISTANCE: 1.5 // MODIFIED: Default distance in front if no surface
+            DEFAULT_PLACEMENT_DISTANCE: 1.0 // Default distance in front if no surface (changed to 1m)
         };
         const enableDirectionalLight = true;
         let directionalLight = null;
@@ -476,17 +476,16 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         }
 
-        // MODIFIED: Function now accepts a scale multiplier
-        function animatePinAppearance(position, scaleMultiplier = 1) {
+        function animatePinAppearance(position, isDefaultPlacement = false) {
             pin.visible = true;
             pin.scale.set(0, 0, 0); 
             
-            const baseScale = 0.0145; // Define the base size
-
+            const targetScale = isDefaultPlacement ? 0.029 : 0.0145; // 2x bigger for default placement
+            
             gsap.to(pin.scale, {
-                x: baseScale * scaleMultiplier, // Use the multiplier
-                y: baseScale * scaleMultiplier, // Use the multiplier
-                z: baseScale * scaleMultiplier, // Use the multiplier
+                x: targetScale,
+                y: targetScale,
+                z: targetScale,
                 duration: 1.5,
                 ease: "elastic.out(1, 0.5)",
                 onStart: () => {
@@ -600,7 +599,7 @@
                                 if (lowestHorizontalHit === null || hitPos.y < lowestHorizontalPosition.y) {
                                     lowestHorizontalHit = hit;
                                     lowestHorizontalPosition.copy(hitPos);
-                                 }
+                                }
                             }
                         }
                     }
@@ -619,7 +618,7 @@
 
                         pin.position.copy(finalPosition);
                         pin.position.add(modelOffset);
-                        animatePinAppearance(pin.position, 1); // MODIFIED: Normal size
+                        animatePinAppearance(pin.position);
 
                         tooltip.style.display = 'block';
                         tooltip.textContent = "There it is! Tap to collect it";
@@ -655,7 +654,7 @@
                 const position = new THREE.Vector3().copy(camera.position).add(direction.multiplyScalar(CONFIG.DEFAULT_PLACEMENT_DISTANCE));
                 pin.position.copy(position);
                 pin.lookAt(camera.position);
-                animatePinAppearance(position, 2); // MODIFIED: 2x bigger
+                animatePinAppearance(position, true); // Pass true for default placement to make 2x bigger
 
                 tooltip.style.display = 'block';
                 tooltip.textContent = "No surface detected. Placed in front—tap to collect!";
