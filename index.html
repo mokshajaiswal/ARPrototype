@@ -120,7 +120,7 @@
         #tooltip {
             position: fixed; /* Ensures positioning is relative to the browser window */
             top: 30px;
-            left: 50%; /* Moves the element's left edge to the center */
+            left:20px; /* Moves the element's left edge to the center */
             transform: translateX(-50%); /* Shifts the element left by half its own width */
             width: calc(100% - 40px); /* Prevents the tooltip from touching screen edges */
             max-width: 450px; /* Sets a max-width for better readability on large screens */
@@ -190,9 +190,9 @@
 
         // --- CONFIGURATION ---
         const CONFIG = {
-            MIN_DISTANCE: 1.0, // Widened for faster placement
-            MAX_DISTANCE: 8.0, // Widened for faster placement
-            RANDOM_RADIUS: 0.6,
+            MIN_DISTANCE: 2.0,
+            MAX_DISTANCE: 7.0,
+            RANDOM_RADIUS: 0,
             ROTATION_SPEED: 0.01
         };
         const enableDirectionalLight = true;
@@ -362,20 +362,20 @@
             let modelPath = 'model1.glb';
 
             if (traceData) {
-                if (traceData.traceType === 'private') {
-                    modelPath = 'models/heart.glb'; // Private traces
-                } else if (traceData.traceType === 'public') {
-                    if (traceData.isFriend) {
-                        modelPath = 'models/stargreen.glb'; // Public traces from a friend
-                    } else {
-                        modelPath = 'models/staryellow.glb'; // Public traces from a non-friend
-                    }
+            if (traceData.traceType === 'private') {
+                modelPath = 'models/heart.glb'; // Private traces
+            } else if (traceData.traceType === 'public') {
+                if (traceData.isFriend) {
+                    modelPath = 'models/stargreen.glb'; // Public traces from a friend
+                } else {
+                    modelPath = 'models/staryellow.glb'; // Public traces from a non-friend
                 }
-            } else {
-                console.warn('Trace data not received from parent app. Using default model.');
             }
+        } else {
+            console.warn('Trace data not received from parent app. Using default model.');
+        }
 
-            console.log(`Loading model: ${modelPath}`); // For debugging
+        console.log(`Loading model: ${modelPath}`); // For debugging
 
             loader.load(
                 modelPath,
@@ -402,36 +402,27 @@
                 undefined,
                 function (error) {
                     console.error('An error happened while loading the model:', error);
+                    alert('Failed to load the custom 3D model. A fallback pin will be used instead.');
+                    // Fallback cone creation logic...
+                    const geometry = new THREE.ConeGeometry(0.1, 0.3, 32);
+                    const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+                    collectibleModel = new THREE.Mesh(geometry, material);
                     
-                    // REMOVED: The blocking alert that caused the loop.
-                    // alert('Failed to load the custom 3D model. A fallback pin will be used instead.');
-                    
-                    // ADDED: Use the non-blocking tooltip to show the error.
-                    tooltip.textContent = 'Model failed to load. Using a fallback.';
-                    tooltip.style.display = 'block';
-
-                    // --- START: Implemented Fallback Logic ---
-                    const fallbackGeometry = new THREE.ConeGeometry(0.05, 0.2, 16); // radius, height, segments
-                    const fallbackMaterial = new THREE.MeshStandardMaterial({ color: 0xE53935 }); // A red color
-                    const fallbackModel = new THREE.Mesh(fallbackGeometry, fallbackMaterial);
-
-                    // This part is similar to the successful load logic
-                    collectibleModel = fallbackModel; // The cone can now be tapped
-                    pin = new THREE.Group();
-                    pin.add(fallbackModel);
-
-                    // Create a simple shadow for the fallback
-                    const box = new THREE.Box3().setFromObject(fallbackModel);
+                    const box = new THREE.Box3().setFromObject(collectibleModel);
+                    const center = box.getCenter(new THREE.Vector3());
                     const size = box.getSize(new THREE.Vector3());
+                    collectibleModel.position.sub(center);
+                    pin = new THREE.Group();
+                    pin.add(collectibleModel);
                     const shadow = createShadow(size);
                     shadow.position.y = -size.y / 2;
                     pin.add(shadow);
-                    
-                    // Set a consistent scale and add to the scene
-                    pin.scale.set(0.2, 0.2, 0.2); 
+                    pin.scale.set(0.0125, 0.0125, 0.0125);
+                    axisHelper = new THREE.AxesHelper(5); 
+                    pin.add(axisHelper);
+                    axisHelper.visible = isAxisVisible;
                     pin.visible = false;
                     if(scene) scene.add(pin);
-                    // --- END: Implemented Fallback Logic ---
                 }
             );
         }
