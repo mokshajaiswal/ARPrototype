@@ -646,13 +646,13 @@
             // Check for timeout if no surface detected
             if (!pinPlaced && Date.now() - sessionStartTime > CONFIG.SURFACE_DETECTION_TIMEOUT) {
                 pinPlaced = true;
-                // Place in center of screen, attached to camera
-                scene.remove(pin); // Ensure it's not in scene root
-                camera.add(pin);
-                pin.position.set(0, 0, -CONFIG.DEFAULT_PLACEMENT_DISTANCE);
-                pin.rotation.set(0, Math.PI, 0); // Face the camera
-                const worldPosition = pin.getWorldPosition(new THREE.Vector3());
-                animatePinAppearance(worldPosition);
+                // Place in world space in front of camera
+                const direction = new THREE.Vector3(0, 0, -1);
+                direction.applyQuaternion(camera.quaternion);
+                const position = new THREE.Vector3().copy(camera.position).add(direction.multiplyScalar(CONFIG.DEFAULT_PLACEMENT_DISTANCE));
+                pin.position.copy(position);
+                pin.lookAt(camera.position);
+                animatePinAppearance(position);
 
                 tooltip.style.display = 'block';
                 tooltip.textContent = "No surface detected. Placed in front—tap to collect!";
