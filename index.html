@@ -191,7 +191,7 @@
         // --- CONFIGURATION ---
         const CONFIG = {
             MIN_DISTANCE: 2.0,
-            MAX_DISTANCE: 4.0,
+            MAX_DISTANCE: 7.0,
             RANDOM_RADIUS: 0,
             ROTATION_SPEED: 0.01
         };
@@ -447,6 +447,10 @@
                 ease: "elastic.out(1, 0.5)",
                 onStart: () => {
                     createConfettiExplosion(position);
+                    // Trigger haptic vibration if supported
+                    if ('vibrate' in navigator) {
+                        navigator.vibrate(200); // Vibrate for 200ms
+                    }
                 }
             });
         }
