@@ -257,30 +257,30 @@
 
         function createChatBubble(text, modelSize) {
             const canvas = document.createElement('canvas');
-            canvas.width = 256;
-            canvas.height = 128;
+            canvas.width = 200; // Reduced width for less padding
+            canvas.height = 80; // Reduced height for less padding
             const ctx = canvas.getContext('2d');
 
-            // Draw rounded rectangle bubble
+            // Draw rounded rectangle bubble with less padding
             ctx.fillStyle = 'white';
             ctx.beginPath();
-            ctx.roundRect(0, 0, 256, 128, 20);
+            ctx.roundRect(10, 10, 180, 60, 15); // Adjusted rect with internal padding
             ctx.fill();
 
             // Draw text
             ctx.fillStyle = 'black';
-            ctx.font = 'bold 24px Arial';
+            ctx.font = 'bold 20px Arial'; // Slightly smaller font if needed
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(text, 128, 64);
+            ctx.fillText(text, 100, 40); // Centered in the reduced rect
 
             const texture = new THREE.CanvasTexture(canvas);
             const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide });
-            const geometry = new THREE.PlaneGeometry(50, 25); // Local size before scale
+            const geometry = new THREE.PlaneGeometry(40, 20); // Adjusted local size before scale
             const bubble = new THREE.Mesh(geometry, material);
 
-            // Position above the model
-            bubble.position.y = modelSize.y / 2 + 10; // Offset above model top
+            // Position higher above the model
+            bubble.position.y = modelSize.y / 2 + 20; // Increased offset for higher placement
 
             return bubble;
         }
