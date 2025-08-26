@@ -187,6 +187,7 @@
         let lastTimestamp = 0;
         let confettiParticles = [];
         let traceData = null;
+        let sessionStartTime = 0;
 
         // --- CONFIGURATION ---
         const CONFIG = {
@@ -194,7 +195,9 @@
             MAX_DISTANCE: 7.0,
             RANDOM_RADIUS: 0,
             ROTATION_SPEED: 0.01,
-            HORIZONTAL_THRESHOLD: 0.95 // Cosine similarity threshold for horizontal planes
+            HORIZONTAL_THRESHOLD: 0.95, // Cosine similarity threshold for horizontal planes
+            SURFACE_DETECTION_TIMEOUT: 8000, // 8 seconds
+            DEFAULT_PLACEMENT_DISTANCE: 3.0 // Default distance in front if no surface
         };
         const enableDirectionalLight = true;
         let directionalLight = null;
@@ -258,7 +261,7 @@
         function createChatBubble(text, modelSize) {
             const canvas = document.createElement('canvas');
             canvas.width = 200; // Reduced width for less padding
-            canvas.height = 60; // Reduced height for less padding
+            canvas.height = 80; // Reduced height for less padding
             const ctx = canvas.getContext('2d');
 
             // Draw rounded rectangle bubble with less padding
@@ -280,7 +283,7 @@
             const bubble = new THREE.Mesh(geometry, material);
 
             // Position higher above the model
-            bubble.position.y = modelSize.y / 2 + 40; // Increased offset for higher placement
+            bubble.position.y = modelSize.y / 2 + 20; // Increased offset for higher placement
 
             return bubble;
         }
@@ -337,6 +340,7 @@
             setupARScene();
             renderer.xr.setReferenceSpaceType('local');
             renderer.xr.setSession(session);
+            sessionStartTime = Date.now(); // Start timeout timer
         }
         
         function onSelect() {
@@ -637,6 +641,29 @@
                     tooltip.style.display = 'block';
                     tooltip.textContent = `Look for a horizontal flat surface like the ground between ${CONFIG.MIN_DISTANCE}m and ${CONFIG.MAX_DISTANCE}m away!`;
                 }
+            }
+            
+            // Check for timeout if no surface detected
+            if (!pinPlaced && Date.now() - sessionStartTime > CONFIG.SURFACE_DETECTION_TIMEOUT) {
+                pinPlaced = true;
+                // Place in center of screen (in front of camera)
+                const direction = new THREE.Vector3();
+                camera.getWorldDirection(direction);
+                direction.negate(); // Point forward
+                const position = new THREE.Vector3().copy(camera.position).add(direction.multiplyScalar(CONFIG.DEFAULT_PLACEMENT_DISTANCE));
+                pin.position.copy(position);
+                animatePinAppearance(pin.position);
+
+                tooltip.style.display = 'block';
+                tooltip.textContent = "No surface detected. Placed in front—tap to collect!";
+                setTimeout(() => { 
+                    if(tooltip.textContent === "No surface detected. Placed in front—tap to collect!") {
+                        tooltip.style.display = 'none';
+                    }
+                    if (pin.userData.bubble) {
+                        pin.userData.bubble.visible = false;
+                    }
+                }, 5000);
             }
             
             if (confettiParticles.length > 0) {
