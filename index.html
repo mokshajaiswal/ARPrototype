@@ -191,13 +191,16 @@
 
         // --- CONFIGURATION ---
         const CONFIG = {
-            MIN_DISTANCE: 1.0,
-            MAX_DISTANCE: 3.0,
+            MIN_DISTANCE: 2.0,
+            MAX_DISTANCE: 7.0,
             RANDOM_RADIUS: 0,
             ROTATION_SPEED: 0.01,
             HORIZONTAL_THRESHOLD: 0.95, // Cosine similarity threshold for horizontal planes
             SURFACE_DETECTION_TIMEOUT: 8000, // 8 seconds
-            DEFAULT_PLACEMENT_DISTANCE: 2.4 // Default distance in front if no surface (changed to 1m)
+            DEFAULT_PLACEMENT_DISTANCE: 1.0, // Default distance in front if no surface (changed to 1m)
+            CHAT_BUBBLE_CANVAS_WIDTH: 200,
+            CHAT_BUBBLE_CANVAS_HEIGHT: 80,
+            CHAT_BUBBLE_VERTICAL_OFFSET: 20
         };
         const enableDirectionalLight = true;
         let directionalLight = null;
@@ -260,14 +263,15 @@
 
         function createChatBubble(text, modelSize) {
             const canvas = document.createElement('canvas');
-            canvas.width = 250; // Reduced width for less padding
-            canvas.height = 60; // Reduced height for less padding
+            canvas.width = CONFIG.CHAT_BUBBLE_CANVAS_WIDTH;
+            canvas.height = CONFIG.CHAT_BUBBLE_CANVAS_HEIGHT;
             const ctx = canvas.getContext('2d');
 
             // Draw rounded rectangle bubble with less padding
             ctx.fillStyle = 'white';
             ctx.beginPath();
-            ctx.roundRect(10, 10, 180, 60, 15); // Adjusted rect with internal padding
+            const padding = 10;
+            ctx.roundRect(padding, padding, CONFIG.CHAT_BUBBLE_CANVAS_WIDTH - 2 * padding, CONFIG.CHAT_BUBBLE_CANVAS_HEIGHT - 2 * padding, 15);
             ctx.fill();
 
             // Draw text
@@ -275,15 +279,15 @@
             ctx.font = 'bold 20px Arial'; // Slightly smaller font if needed
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(text, 100, 40); // Centered in the reduced rect
+            ctx.fillText(text, CONFIG.CHAT_BUBBLE_CANVAS_WIDTH / 2, CONFIG.CHAT_BUBBLE_CANVAS_HEIGHT / 2);
 
             const texture = new THREE.CanvasTexture(canvas);
             const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide });
-            const geometry = new THREE.PlaneGeometry(40, 20); // Adjusted local size before scale
+            const geometry = new THREE.PlaneGeometry(CONFIG.CHAT_BUBBLE_CANVAS_WIDTH / 5, CONFIG.CHAT_BUBBLE_CANVAS_HEIGHT / 4); // Adjusted local size before scale
             const bubble = new THREE.Mesh(geometry, material);
 
             // Position higher above the model
-            bubble.position.y = modelSize.y / 2 + 40; // Increased offset for higher placement
+            bubble.position.y = modelSize.y / 2 + CONFIG.CHAT_BUBBLE_VERTICAL_OFFSET;
 
             return bubble;
         }
