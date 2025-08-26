@@ -402,7 +402,7 @@
                 undefined,
                 function (error) {
                     console.error('An error happened while loading the model:', error);
-                    alert('Failed to load the custom 3D model. A fallback pin will be used instead.');
+                    // Removed alert to prevent session interruption
                     // Fallback cone creation logic...
                     const geometry = new THREE.ConeGeometry(0.1, 0.3, 32);
                     const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
