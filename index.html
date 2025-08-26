@@ -518,6 +518,9 @@
                     if ('vibrate' in navigator) {
                         navigator.vibrate(200); // Vibrate for 200ms
                     }
+                    if (isDefaultPlacement && pin.userData.bubble) {
+                        pin.userData.bubble.visible = false;
+                    }
                 }
             });
         }
