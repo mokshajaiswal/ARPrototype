@@ -193,7 +193,8 @@
             MIN_DISTANCE: 2.0,
             MAX_DISTANCE: 7.0,
             RANDOM_RADIUS: 0,
-            ROTATION_SPEED: 0.01
+            ROTATION_SPEED: 0.01,
+            HORIZONTAL_THRESHOLD: 0.95 // Cosine similarity threshold for horizontal planes
         };
         const enableDirectionalLight = true;
         let directionalLight = null;
@@ -542,32 +543,36 @@
 
             if (hitTestSource && !pinPlaced) {
                 const hitTestResults = frame.getHitTestResults(hitTestSource);
-                let lowestHit = null;
-                let lowestHitPosition = new THREE.Vector3();
+                let lowestHorizontalHit = null;
+                let lowestHorizontalPosition = new THREE.Vector3();
 
                 if (hitTestResults.length > 0) {
                     for (const hit of hitTestResults) {
                         const pose = hit.getPose(referenceSpace);
                         if (pose) {
-                            const hitPos = new THREE.Vector3().setFromMatrixPosition(new THREE.Matrix4().fromArray(pose.transform.matrix));
-                            if (lowestHit === null || hitPos.y < lowestHitPosition.y) {
-                                lowestHit = hit;
-                                lowestHitPosition.copy(hitPos);
+                            const matrix = new THREE.Matrix4().fromArray(pose.transform.matrix);
+                            const normal = new THREE.Vector3(matrix.elements[4], matrix.elements[5], matrix.elements[6]).normalize();
+                            if (Math.abs(normal.y) > CONFIG.HORIZONTAL_THRESHOLD) { // Horizontal plane check
+                                const hitPos = new THREE.Vector3().setFromMatrixPosition(matrix);
+                                if (lowestHorizontalHit === null || hitPos.y < lowestHorizontalPosition.y) {
+                                    lowestHorizontalHit = hit;
+                                    lowestHorizontalPosition.copy(hitPos);
+                                }
                             }
                         }
                     }
                 }
                 
-                if (lowestHit) {
+                if (lowestHorizontalHit) {
                     const cameraPosition = new THREE.Vector3().setFromMatrixPosition(camera.matrixWorld);
-                    const distance = cameraPosition.distanceTo(lowestHitPosition);
+                    const distance = cameraPosition.distanceTo(lowestHorizontalPosition);
 
                     if (distance >= CONFIG.MIN_DISTANCE && distance <= CONFIG.MAX_DISTANCE) {
                         pinPlaced = true; 
                         
                         const randomX = (Math.random() - 0.5) * 2 * CONFIG.RANDOM_RADIUS;
                         const randomZ = (Math.random() - 0.5) * 2 * CONFIG.RANDOM_RADIUS;
-                        const finalPosition = lowestHitPosition.clone().add(new THREE.Vector3(randomX, 0, randomZ));
+                        const finalPosition = lowestHorizontalPosition.clone().add(new THREE.Vector3(randomX, 0, randomZ));
 
                         pin.position.copy(finalPosition);
                         pin.position.add(modelOffset);
@@ -584,14 +589,14 @@
                     } else {
                         tooltip.style.display = 'block';
                         if (distance < CONFIG.MIN_DISTANCE) {
-                             tooltip.textContent = "Surface is too close. Please move back.";
+                             tooltip.textContent = "Horizontal surface is too close. Please move back.";
                         } else {
-                             tooltip.textContent = "Surface is too far. Please move closer.";
+                             tooltip.textContent = "Horizontal surface is too far. Please move closer.";
                         }
                     }
                 } else if (!pinPlaced) {
                     tooltip.style.display = 'block';
-                    tooltip.textContent = `Look for a flat surface between ${CONFIG.MIN_DISTANCE}m and ${CONFIG.MAX_DISTANCE}m away!`;
+                    tooltip.textContent = `Look for a horizontal flat surface like the ground between ${CONFIG.MIN_DISTANCE}m and ${CONFIG.MAX_DISTANCE}m away!`;
                 }
             }
             
