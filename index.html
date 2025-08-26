@@ -403,8 +403,8 @@
                 function (error) {
                     console.error('An error happened while loading the model:', error);
                     // Removed alert to prevent session interruption
-                    // Fallback cone creation logic...
-                    const geometry = new THREE.ConeGeometry(0.1, 0.3, 32);
+                    // Fallback cone creation logic with larger size
+                    const geometry = new THREE.ConeGeometry(5, 15, 32); // Increased size for visibility
                     const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
                     collectibleModel = new THREE.Mesh(geometry, material);
                     
@@ -423,6 +423,7 @@
                     axisHelper.visible = isAxisVisible;
                     pin.visible = false;
                     if(scene) scene.add(pin);
+                    console.log('Fallback pin loaded'); // For debugging
                 }
             );
         }
