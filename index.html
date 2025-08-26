@@ -190,11 +190,11 @@
 
         // --- CONFIGURATION ---
         const CONFIG = {
-            MIN_DISTANCE: 0.6,
-            MAX_DISTANCE: 3.0,
+            MIN_DISTANCE: 2.0,
+            MAX_DISTANCE: 7.0,
             RANDOM_RADIUS: 0,
             ROTATION_SPEED: 0.01,
-            HORIZONTAL_THRESHOLD: 0.89 // Cosine similarity threshold for horizontal planes
+            HORIZONTAL_THRESHOLD: 0.95 // Cosine similarity threshold for horizontal planes
         };
         const enableDirectionalLight = true;
         let directionalLight = null;
@@ -253,6 +253,36 @@
             shadowMesh.position.x = shadowOffsetX;
             shadowMesh.position.z = shadowOffsetZ;
             return shadowMesh;
+        }
+
+        function createChatBubble(text, modelSize) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+
+            // Draw rounded rectangle bubble
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.roundRect(0, 0, 256, 128, 20);
+            ctx.fill();
+
+            // Draw text
+            ctx.fillStyle = 'black';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, 128, 64);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide });
+            const geometry = new THREE.PlaneGeometry(50, 25); // Local size before scale
+            const bubble = new THREE.Mesh(geometry, material);
+
+            // Position above the model
+            bubble.position.y = modelSize.y / 2 + 10; // Offset above model top
+
+            return bubble;
         }
 
         function setupARScene() {
@@ -393,6 +423,9 @@
                     const shadow = createShadow(size);
                     shadow.position.y = -size.y / 2;
                     pin.add(shadow);
+                    const bubble = createChatBubble("Come closer and tap!", size);
+                    pin.add(bubble);
+                    pin.userData.bubble = bubble;
                     pin.scale.set(0.0125, 0.0125, 0.0125);
                     axisHelper = new THREE.AxesHelper(5); 
                     pin.add(axisHelper);
@@ -418,6 +451,9 @@
                     const shadow = createShadow(size);
                     shadow.position.y = -size.y / 2;
                     pin.add(shadow);
+                    const bubble = createChatBubble("Come closer and tap!", size);
+                    pin.add(bubble);
+                    pin.userData.bubble = bubble;
                     pin.scale.set(0.0125, 0.0125, 0.0125);
                     axisHelper = new THREE.AxesHelper(5); 
                     pin.add(axisHelper);
@@ -584,6 +620,9 @@
                             if(tooltip.textContent === "There it is! Tap to collect it") {
                                 tooltip.style.display = 'none';
                             }
+                            if (pin.userData.bubble) {
+                                pin.userData.bubble.visible = false;
+                            }
                         }, 5000);
 
                     } else {
@@ -624,6 +663,10 @@
                         leftArrow.classList.remove('visible');
                         rightArrow.classList.remove('visible');
                     }
+                }
+                // Make chat bubble face the camera if it exists and is visible
+                if (pin.userData.bubble && pin.userData.bubble.visible) {
+                    pin.userData.bubble.lookAt(camera.position);
                 }
             } else {
                 leftArrow.classList.remove('visible');
