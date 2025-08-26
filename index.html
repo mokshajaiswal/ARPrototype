@@ -217,7 +217,7 @@
             console.log("Received trace data for AR:", traceData);
         });
             startButton.addEventListener('click', onStartAR);
-
+            createPin(); // Preload the pin model on init for faster appearance
         }
         
         function createShadow(modelSize) {
@@ -272,7 +272,7 @@
                 directionalLight.position.set(1, 1, 1);
                 scene.add(directionalLight);
             }
-            createPin();
+            if (pin) scene.add(pin); // Add preloaded pin to scene
             renderer.setAnimationLoop(render);
             window.addEventListener('resize', onWindowResize, false);
         }
@@ -398,7 +398,7 @@
                     pin.add(axisHelper);
                     axisHelper.visible = isAxisVisible;
                     pin.visible = false;
-                    if(scene) scene.add(pin);
+                    // Do not add to scene here; add in setupARScene
                 },
                 undefined,
                 function (error) {
@@ -423,7 +423,7 @@
                     pin.add(axisHelper);
                     axisHelper.visible = isAxisVisible;
                     pin.visible = false;
-                    if(scene) scene.add(pin);
+                    // Do not add to scene here; add in setupARScene
                     console.log('Fallback pin loaded'); // For debugging
                 }
             );
