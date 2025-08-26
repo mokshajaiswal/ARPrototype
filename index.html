@@ -120,7 +120,7 @@
         #tooltip {
             position: fixed; /* Ensures positioning is relative to the browser window */
             top: 30px;
-            left:20px; /* Moves the element's left edge to the center */
+            left: 50%; /* Moves the element's left edge to the center */
             transform: translateX(-50%); /* Shifts the element left by half its own width */
             width: calc(100% - 40px); /* Prevents the tooltip from touching screen edges */
             max-width: 450px; /* Sets a max-width for better readability on large screens */
@@ -191,13 +191,13 @@
 
         // --- CONFIGURATION ---
         const CONFIG = {
-            MIN_DISTANCE: 1.0,
-            MAX_DISTANCE: 3.0,
+            MIN_DISTANCE: 2.0,
+            MAX_DISTANCE: 7.0,
             RANDOM_RADIUS: 0,
             ROTATION_SPEED: 0.01,
             HORIZONTAL_THRESHOLD: 0.95, // Cosine similarity threshold for horizontal planes
             SURFACE_DETECTION_TIMEOUT: 8000, // 8 seconds
-            DEFAULT_PLACEMENT_DISTANCE: 1.0 // Default distance in front if no surface
+            DEFAULT_PLACEMENT_DISTANCE: 1.5 // MODIFIED: Default distance in front if no surface
         };
         const enableDirectionalLight = true;
         let directionalLight = null;
@@ -476,14 +476,17 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         }
 
-        function animatePinAppearance(position) {
+        // MODIFIED: Function now accepts a scale multiplier
+        function animatePinAppearance(position, scaleMultiplier = 1) {
             pin.visible = true;
             pin.scale.set(0, 0, 0); 
             
+            const baseScale = 0.0145; // Define the base size
+
             gsap.to(pin.scale, {
-                x: 0.0145,
-                y: 0.0145,
-                z: 0.0145,
+                x: baseScale * scaleMultiplier, // Use the multiplier
+                y: baseScale * scaleMultiplier, // Use the multiplier
+                z: baseScale * scaleMultiplier, // Use the multiplier
                 duration: 1.5,
                 ease: "elastic.out(1, 0.5)",
                 onStart: () => {
@@ -597,7 +600,7 @@
                                 if (lowestHorizontalHit === null || hitPos.y < lowestHorizontalPosition.y) {
                                     lowestHorizontalHit = hit;
                                     lowestHorizontalPosition.copy(hitPos);
-                                }
+                                 }
                             }
                         }
                     }
@@ -616,7 +619,7 @@
 
                         pin.position.copy(finalPosition);
                         pin.position.add(modelOffset);
-                        animatePinAppearance(pin.position);
+                        animatePinAppearance(pin.position, 1); // MODIFIED: Normal size
 
                         tooltip.style.display = 'block';
                         tooltip.textContent = "There it is! Tap to collect it";
@@ -652,7 +655,7 @@
                 const position = new THREE.Vector3().copy(camera.position).add(direction.multiplyScalar(CONFIG.DEFAULT_PLACEMENT_DISTANCE));
                 pin.position.copy(position);
                 pin.lookAt(camera.position);
-                animatePinAppearance(position);
+                animatePinAppearance(position, 2); // MODIFIED: 2x bigger
 
                 tooltip.style.display = 'block';
                 tooltip.textContent = "No surface detected. Placed in front—tap to collect!";
