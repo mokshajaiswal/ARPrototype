@@ -137,9 +137,9 @@
         /* Movement guide animation styles */
         #movement-guide {
             position: fixed;
-            top: 50%;
+            bottom: 20px;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translateX(-50%);
             display: none;
             flex-direction: column;
             align-items: center;
@@ -230,12 +230,12 @@
         let sessionStartTime = 0;
         // --- CONFIGURATION ---
         const CONFIG = {
-            MIN_DISTANCE: 1.4,
-            MAX_DISTANCE: 2.5,
+            MIN_DISTANCE: 2,
+            MAX_DISTANCE: 4.5,
             RANDOM_RADIUS: 0,
-            ROTATION_SPEED: 0.01,
+            ROTATION_SPEED: 0.04,
             HORIZONTAL_THRESHOLD: 0.95, // Cosine similarity threshold for horizontal planes
-            SURFACE_DETECTION_TIMEOUT: 8000, // 8 seconds
+            SURFACE_DETECTION_TIMEOUT: 13000, // 8 seconds
             DEFAULT_PLACEMENT_DISTANCE: 2.0, // Default distance in front if no surface (changed to 1m)
             CHAT_BUBBLE_CANVAS_WIDTH: 260,
             CHAT_BUBBLE_CANVAS_HEIGHT: 60,
@@ -259,9 +259,10 @@
            
             traceData = event.data;
             console.log("Received trace data for AR:", traceData);
+            createPin();
         });
             startButton.addEventListener('click', onStartAR);
-            createPin(); // Preload the pin model on init for faster appearance
+            // Preload the pin model on init for faster appearance
         }
        
         function createShadow(modelSize) {
@@ -401,7 +402,7 @@
                 directionalLight.dispose();
                 directionalLight = null;
             }
-           
+            movementGuide.classList.remove('visible');
             startContainer.style.display = 'flex';
             if(renderer) {
                 renderer.setAnimationLoop(null);
@@ -426,12 +427,12 @@
             let modelPath = 'model1.glb';
             if (traceData) {
             if (traceData.traceType === 'private') {
-                modelPath = 'models/heart.glb'; // Private traces
+                modelPath = 'heart.glb'; // Private traces
             } else if (traceData.traceType === 'public') {
                 if (traceData.isFriend) {
-                    modelPath = 'models/stargreen.glb'; // Public traces from a friend
+                    modelPath = 'stargreen.glb'; // Public traces from a friend
                 } else {
-                    modelPath = 'models/staryellow.glb'; // Public traces from a non-friend
+                    modelPath = 'staryellow.glb'; // Public traces from a non-friend
                 }
             }
         } else {
