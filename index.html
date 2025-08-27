@@ -135,8 +135,8 @@
         /* CORRECTED Tooltip styles */
         #tooltip {
             position: fixed; /* Ensures positioning is relative to the browser window */
-            top: 30px;
-            left:40px; /* Moves the element's left edge to the center */
+            bottom: 350px;
+            left:20px; /* Moves the element's left edge to the center */
              /* Shifts the element left by half its own width */
             width: calc(100% - 40px); /* Prevents the tooltip from touching screen edges */
             max-width: 450px; /* Sets a max-width for better readability on large screens */
@@ -174,12 +174,6 @@
         #movement-guide.visible {
             display: flex;
         }
-        #movement-guide .guide-text {
-            margin-top: 10px;
-            background-color: rgba(0, 0, 0, 0.6);
-            padding: 8px 16px;
-            border-radius: 20px;
-        }
        
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
@@ -200,7 +194,6 @@
         <div id="tooltip">Look around to find the Trace!</div>
         <div id="movement-guide">
             <lottie-player src="movephone.json" background="transparent" speed="1" style="width: 300px; height: 300px;" loop autoplay></lottie-player>
-            <div class="guide-text">look around you to find the hidden trace</div>
         </div>
     </div>
      <script type="importmap">
