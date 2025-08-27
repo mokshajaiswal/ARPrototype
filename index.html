@@ -106,9 +106,19 @@
         .arrow.visible {
             display: flex;
             opacity: 1;
+            animation: jump-arrow 0.8s ease-in-out infinite alternate;
         }
         #left-arrow { left: 15px; }
-        #right-arrow { right: 15px; }
+        #right-arrow { right: 15px; animation-direction: alternate-reverse; } /* Reverse for right arrow to jump outward */
+        /* Jumpy animation for arrows */
+        @keyframes jump-arrow {
+            0% {
+                transform: translateY(-50%) translateX(0);
+            }
+            100% {
+                transform: translateY(-50%) translateX(10px); /* Jump to the right; left arrow jumps left if not reversed */
+            }
+        }
         /* CORRECTED Tooltip styles */
         #tooltip {
             position: fixed; /* Ensures positioning is relative to the browser window */
