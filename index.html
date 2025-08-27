@@ -100,30 +100,43 @@
             z-index: 12;
             user-select: none;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            transition: opacity 0.3s ease, transform 0.3s ease;
+            transition: opacity 0.3s ease;
             opacity: 0;
         }
         .arrow.visible {
             display: flex;
             opacity: 1;
-            animation: jump-arrow 0.8s ease-in-out infinite alternate;
         }
-        #left-arrow { left: 15px; }
-        #right-arrow { right: 15px; animation-direction: alternate-reverse; } /* Reverse for right arrow to jump outward */
-        /* Jumpy animation for arrows */
-        @keyframes jump-arrow {
+        #left-arrow { 
+            left: 15px; 
+            animation: jump-left 0.5s ease-in-out infinite alternate; 
+        }
+        #right-arrow { 
+            right: 15px; 
+            animation: jump-right 0.5s ease-in-out infinite alternate; 
+        }
+        /* Jumpy animations for arrows */
+        @keyframes jump-left {
             0% {
                 transform: translateY(-50%) translateX(0);
             }
             100% {
-                transform: translateY(-50%) translateX(10px); /* Jump to the right; left arrow jumps left if not reversed */
+                transform: translateY(-50%) translateX(-10px);
+            }
+        }
+        @keyframes jump-right {
+            0% {
+                transform: translateY(-50%) translateX(0);
+            }
+            100% {
+                transform: translateY(-50%) translateX(10px);
             }
         }
         /* CORRECTED Tooltip styles */
         #tooltip {
             position: fixed; /* Ensures positioning is relative to the browser window */
             top: 30px;
-            left:20px; /* Moves the element's left edge to the center */
+            left:50%; /* Moves the element's left edge to the center */
             transform: translateX(-50%); /* Shifts the element left by half its own width */
             width: calc(100% - 40px); /* Prevents the tooltip from touching screen edges */
             max-width: 450px; /* Sets a max-width for better readability on large screens */
@@ -147,9 +160,9 @@
         /* Movement guide animation styles */
         #movement-guide {
             position: fixed;
-            bottom: 20px;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translate(-50%, -50%);
             display: none;
             flex-direction: column;
             align-items: center;
@@ -244,7 +257,7 @@
             MAX_DISTANCE: 4.5,
             RANDOM_RADIUS: 0,
             ROTATION_SPEED: 0.04,
-            HORIZONTAL_THRESHOLD: 0.95, // Cosine similarity threshold for horizontal planes
+            HORIZONTAL_THRESHOLD: 0.99, // Tightened for stricter horizontal planes
             SURFACE_DETECTION_TIMEOUT: 13000, // 13 seconds
             DEFAULT_PLACEMENT_DISTANCE: 2.0, // Default distance in front if no surface
             CHAT_BUBBLE_CANVAS_WIDTH: 512, // Increased for higher resolution/sharpness
@@ -617,6 +630,7 @@
                 const hitTestResults = frame.getHitTestResults(hitTestSource);
                 let lowestHorizontalHit = null;
                 let lowestHorizontalPosition = new THREE.Vector3();
+                let lowestHorizontalMatrix = new THREE.Matrix4();
                 if (hitTestResults.length > 0) {
                     for (const hit of hitTestResults) {
                         const pose = hit.getPose(referenceSpace);
@@ -628,6 +642,7 @@
                                 if (lowestHorizontalHit === null || hitPos.y < lowestHorizontalPosition.y) {
                                     lowestHorizontalHit = hit;
                                     lowestHorizontalPosition.copy(hitPos);
+                                    lowestHorizontalMatrix.copy(matrix);
                                 }
                             }
                         }
@@ -645,6 +660,9 @@
                         const finalPosition = lowestHorizontalPosition.clone().add(new THREE.Vector3(randomX, 0, randomZ));
                         pin.position.copy(finalPosition);
                         pin.position.add(modelOffset);
+                        // Set rotation from the plane's matrix to align with surface normal (upright)
+                        pin.setRotationFromMatrix(lowestHorizontalMatrix);
+                        // But since it's horizontal, rotation should keep Y-up; adjust if needed
                         animatePinAppearance(pin.position);
                         tooltip.style.display = 'block';
                         tooltip.textContent = "There it is! Tap to collect it";
@@ -679,7 +697,9 @@
                 direction.applyQuaternion(camera.quaternion);
                 const position = new THREE.Vector3().copy(camera.position).add(direction.multiplyScalar(CONFIG.DEFAULT_PLACEMENT_DISTANCE));
                 pin.position.copy(position);
-                pin.lookAt(camera.position);
+                // For upright in default placement: Rotate only around Y to face camera, keep pitch/roll zero
+                const cameraPositionXZ = new THREE.Vector3(camera.position.x, pin.position.y, camera.position.z); // Project camera to pin's Y plane
+                pin.lookAt(cameraPositionXZ);
                 animatePinAppearance(position, true); // Pass true for default placement to make 2x bigger
                 tooltip.style.display = 'block';
                 tooltip.textContent = "No surface detected. Placed in front—tap to collect!";
