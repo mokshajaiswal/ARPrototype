@@ -235,11 +235,12 @@
             RANDOM_RADIUS: 0,
             ROTATION_SPEED: 0.04,
             HORIZONTAL_THRESHOLD: 0.95, // Cosine similarity threshold for horizontal planes
-            SURFACE_DETECTION_TIMEOUT: 13000, // 8 seconds
-            DEFAULT_PLACEMENT_DISTANCE: 2.0, // Default distance in front if no surface (changed to 1m)
-            CHAT_BUBBLE_CANVAS_WIDTH: 260,
-            CHAT_BUBBLE_CANVAS_HEIGHT: 60,
-            CHAT_BUBBLE_VERTICAL_OFFSET: 22
+            SURFACE_DETECTION_TIMEOUT: 13000, // 13 seconds
+            DEFAULT_PLACEMENT_DISTANCE: 2.0, // Default distance in front if no surface
+            CHAT_BUBBLE_CANVAS_WIDTH: 512, // Increased for higher resolution/sharpness
+            CHAT_BUBBLE_CANVAS_HEIGHT: 128, // Increased for higher resolution/sharpness
+            CHAT_BUBBLE_VERTICAL_OFFSET: 22,
+            CHAT_BUBBLE_HIDE_TIMEOUT: 10000 // Increased from 5000ms to 10 seconds
         };
         const enableDirectionalLight = true;
         let directionalLight = null;
@@ -307,18 +308,20 @@
             // Draw rounded rectangle bubble with less padding
             ctx.fillStyle = 'white';
             ctx.beginPath();
-            const padding = 10;
-            ctx.roundRect(padding, padding, CONFIG.CHAT_BUBBLE_CANVAS_WIDTH - 2 * padding, CONFIG.CHAT_BUBBLE_CANVAS_HEIGHT - 2 * padding, 15);
+            const padding = 20; // Increased padding for larger canvas
+            ctx.roundRect(padding, padding, CONFIG.CHAT_BUBBLE_CANVAS_WIDTH - 2 * padding, CONFIG.CHAT_BUBBLE_CANVAS_HEIGHT - 2 * padding, 30); // Larger radius for smoothness
             ctx.fill();
             // Draw text
             ctx.fillStyle = 'black';
-            ctx.font = 'bold 20px Arial'; // Slightly smaller font if needed
+            ctx.font = 'bold 40px Arial'; // Doubled font size for sharpness
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(text, CONFIG.CHAT_BUBBLE_CANVAS_WIDTH / 2, CONFIG.CHAT_BUBBLE_CANVAS_HEIGHT / 2);
             const texture = new THREE.CanvasTexture(canvas);
+            texture.minFilter = THREE.LinearFilter; // For sharper text rendering
+            texture.magFilter = THREE.LinearFilter;
             const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide });
-            const geometry = new THREE.PlaneGeometry(CONFIG.CHAT_BUBBLE_CANVAS_WIDTH / 5, CONFIG.CHAT_BUBBLE_CANVAS_HEIGHT / 4); // Adjusted local size before scale
+            const geometry = new THREE.PlaneGeometry(CONFIG.CHAT_BUBBLE_CANVAS_WIDTH / 10, CONFIG.CHAT_BUBBLE_CANVAS_HEIGHT / 8); // Adjusted divisors to maintain similar physical size (doubled canvas, so double divisors)
             const bubble = new THREE.Mesh(geometry, material);
             // Position higher above the model
             bubble.position.y = modelSize.y / 2 + CONFIG.CHAT_BUBBLE_VERTICAL_OFFSET;
@@ -642,7 +645,7 @@
                             if (pin.userData.bubble) {
                                 pin.userData.bubble.visible = false;
                             }
-                        }, 5000);
+                        }, CONFIG.CHAT_BUBBLE_HIDE_TIMEOUT);
                         movementGuide.classList.remove('visible'); // Hide movement guide once placed
                     } else {
                         tooltip.style.display = 'block';
@@ -677,7 +680,7 @@
                     if (pin.userData.bubble) {
                         pin.userData.bubble.visible = false;
                     }
-                }, 5000);
+                }, CONFIG.CHAT_BUBBLE_HIDE_TIMEOUT);
                 movementGuide.classList.remove('visible'); // Hide movement guide on timeout placement
             }
            
