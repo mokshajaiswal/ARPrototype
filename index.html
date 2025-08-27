@@ -658,28 +658,25 @@
            
             // Check for timeout if no surface detected
             if (!pinPlaced && Date.now() - sessionStartTime > CONFIG.SURFACE_DETECTION_TIMEOUT) {
-                // --- FIX: Check if pin exists before using it ---
-                if (pin) {
-                    pinPlaced = true;
-                    // Place in world space in front of camera
-                    const direction = new THREE.Vector3(0, 0, -1);
-                    direction.applyQuaternion(camera.quaternion);
-                    const position = new THREE.Vector3().copy(camera.position).add(direction.multiplyScalar(CONFIG.DEFAULT_PLACEMENT_DISTANCE));
-                    pin.position.copy(position);
-                    pin.lookAt(camera.position);
-                    animatePinAppearance(position, true); // Pass true for default placement to make 2x bigger
-                    tooltip.style.display = 'block';
-                    tooltip.textContent = "No surface detected. Placed in front—tap to collect!";
-                    setTimeout(() => {
-                        if(tooltip.textContent === "No surface detected. Placed in front—tap to collect!") {
-                            tooltip.style.display = 'none';
-                        }
-                        if (pin.userData.bubble) {
-                            pin.userData.bubble.visible = false;
-                        }
-                    }, 5000);
-                    movementGuide.classList.remove('visible'); // Hide movement guide on timeout placement
-                }
+                pinPlaced = true;
+                // Place in world space in front of camera
+                const direction = new THREE.Vector3(0, 0, -1);
+                direction.applyQuaternion(camera.quaternion);
+                const position = new THREE.Vector3().copy(camera.position).add(direction.multiplyScalar(CONFIG.DEFAULT_PLACEMENT_DISTANCE));
+                pin.position.copy(position);
+                pin.lookAt(camera.position);
+                animatePinAppearance(position, true); // Pass true for default placement to make 2x bigger
+                tooltip.style.display = 'block';
+                tooltip.textContent = "No surface detected. Placed in front—tap to collect!";
+                setTimeout(() => {
+                    if(tooltip.textContent === "No surface detected. Placed in front—tap to collect!") {
+                        tooltip.style.display = 'none';
+                    }
+                    if (pin.userData.bubble) {
+                        pin.userData.bubble.visible = false;
+                    }
+                }, 5000);
+                movementGuide.classList.remove('visible'); // Hide movement guide on timeout placement
             }
            
             if (confettiParticles.length > 0) {
