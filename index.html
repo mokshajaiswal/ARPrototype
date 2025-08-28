@@ -390,12 +390,12 @@
                     gsap.to('#success-circle', {
                       width: Math.max(window.innerWidth, window.innerHeight) * 2 + 'px',
                       height: Math.max(window.innerWidth, window.innerHeight) * 2 + 'px',
-                      duration: 2.5,
+                      duration: 2,
                       ease: "power2.out"
                     });
                     gsap.fromTo('#success-text', 
-                      { y: 0 },
-                      { y: -100, duration: 2.5, ease: "power2.out" }
+                      { y: 100 },
+                      { y: 0, duration: 2, ease: "power2.out" }
                     );
                     setTimeout(() => {
                       window.parent.postMessage('AR_ACTIVITY_COMPLETE', '*');
