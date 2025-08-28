@@ -135,7 +135,7 @@
         /* CORRECTED Tooltip styles */
         #tooltip {
             position: fixed; /* Ensures positioning is relative to the browser window */
-            bottom: 160px;
+            bottom: 260px;
             left:20px; /* Moves the element's left edge to the center */
              /* Shifts the element left by half its own width */
             width: calc(100% - 40px); /* Prevents the tooltip from touching screen edges */
@@ -667,14 +667,15 @@
                     } else {
                         tooltip.style.display = 'block';
                         if (distance < CONFIG.MIN_DISTANCE) {
-                             tooltip.textContent = "Horizontal surface is too close. Please move back.";
+                             tooltip.textContent = "Too close. Please move back.";
                         } else {
-                             tooltip.textContent = "Horizontal surface is too far. Please move closer.";
+                             tooltip.textContent = "Too far. Please move closer.";
                         }
                     }
                 } else if (!pinPlaced) {
                     tooltip.style.display = 'block';
-                    tooltip.textContent = `Look for a horizontal flat surface like the ground between ${CONFIG.MIN_DISTANCE}m and ${CONFIG.MAX_DISTANCE}m away!`;
+                    tooltip.textContent = `Look around the ground near you to find the hidden trace!`;
+                    //tooltip.textContent = `Look for a horizontal flat surface like the ground between ${CONFIG.MIN_DISTANCE}m and ${CONFIG.MAX_DISTANCE}m away!`;
                 }
             }
          
