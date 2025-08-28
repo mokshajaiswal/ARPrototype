@@ -135,7 +135,7 @@
         /* CORRECTED Tooltip styles */
         #tooltip {
             position: fixed; /* Ensures positioning is relative to the browser window */
-            bottom: 90px;
+            bottom: 120px;
             left:20px; /* Moves the element's left edge to the center */
              /* Shifts the element left by half its own width */
             width: calc(100% - 40px); /* Prevents the tooltip from touching screen edges */
@@ -225,8 +225,8 @@
         let sessionStartTime = 0;
         // --- CONFIGURATION ---
         const CONFIG = {
-            MIN_DISTANCE: 2,
-            MAX_DISTANCE: 4.5,
+            MIN_DISTANCE: 1.5,
+            MAX_DISTANCE: 3.5,
             RANDOM_RADIUS: 0,
             ROTATION_SPEED: 0.04,
             HORIZONTAL_THRESHOLD: 0.99, // Tightened for stricter horizontal planes
@@ -386,7 +386,7 @@
                     pin.visible = false;
                     document.getElementById('success-circle').style.display = 'block';
                     document.getElementById('success-text').style.display = 'block';
-                    document.getElementById('success-text').textContent = 'You got it';
+                    document.getElementById('success-text').textContent = 'You got it!';
                     gsap.to('#success-circle', {
                       width: Math.max(window.innerWidth, window.innerHeight) * 2 + 'px',
                       height: Math.max(window.innerWidth, window.innerHeight) * 2 + 'px',
