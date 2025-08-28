@@ -135,7 +135,7 @@
         /* CORRECTED Tooltip styles */
         #tooltip {
             position: fixed; /* Ensures positioning is relative to the browser window */
-            bottom: 60px;
+            bottom: 90px;
             left:20px; /* Moves the element's left edge to the center */
              /* Shifts the element left by half its own width */
             width: calc(100% - 40px); /* Prevents the tooltip from touching screen edges */
@@ -194,7 +194,7 @@
         <div id="movement-guide">
             <lottie-player src="movephone.json" background="transparent" speed="1" style="width: 300px; height: 300px;" loop autoplay></lottie-player>
         </div>
-        <div id="success-circle" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 0; height: 0; background-color: #A7C7E7; border-radius: 50%; z-index: 14;"></div>
+        <div id="success-circle" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 0; height: 0; background-color: #0C3879; border-radius: 50%; z-index: 14;"></div>
         <div id="success-text" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 32px; font-weight: bold; z-index: 15; color: white;"></div>
     </div>
      <script type="importmap">
@@ -390,12 +390,12 @@
                     gsap.to('#success-circle', {
                       width: Math.max(window.innerWidth, window.innerHeight) * 2 + 'px',
                       height: Math.max(window.innerWidth, window.innerHeight) * 2 + 'px',
-                      duration: 2,
+                      duration: 1,
                       ease: "power2.out"
                     });
                     gsap.fromTo('#success-text', 
                       { y: 100 },
-                      { y: 0, duration: 2, ease: "power2.out" }
+                      { y: 0, duration: 1, ease: "power2.out" }
                     );
                     setTimeout(() => {
                       window.parent.postMessage('AR_ACTIVITY_COMPLETE', '*');
