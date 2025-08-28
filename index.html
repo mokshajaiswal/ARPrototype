@@ -387,7 +387,8 @@
                     pin.visible = false;
                     document.getElementById('success-circle').style.display = 'block';
                     document.getElementById('success-text').style.display = 'block';
-                    document.getElementById('success-text').textContent = 'Trace Collected!';
+                    // This is the updated line
+                    document.getElementById('success-text').innerHTML = '<span style="font-size: 48px; display: block; margin-bottom: 10px;">👏</span>Trace Collected!';
                     gsap.to('#success-circle', {
                       width: Math.max(window.innerWidth, window.innerHeight) * 2 + 'px',
                       height: Math.max(window.innerWidth, window.innerHeight) * 2 + 'px',
