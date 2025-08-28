@@ -394,8 +394,8 @@
                       ease: "power2.out"
                     });
                     gsap.fromTo('#success-text', 
-                      { y: 100 },
-                      { y: 0, duration: 1, ease: "power2.out" }
+                      { y: 80 },
+                      { y: -30, duration: 1, ease: "power2.out" }
                     );
                     setTimeout(() => {
                       window.parent.postMessage('AR_ACTIVITY_COMPLETE', '*');
